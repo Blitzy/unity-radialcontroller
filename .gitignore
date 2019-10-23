@@ -1,0 +1,55 @@
+.DS_Store
+Thumbs.db
+Thumbs.db.meta
+
+*/.msdk/data/
+**/StreamingAssets/buildInfo.txt*
+**/StreamingAssets/app-version.json*
+
+Recommendations.asset*
+
+Library/
+Temp/
+obj/
+
+.vs/
+.vscode/
+
+*.taghl
+*.taghl.meta
+*.swp
+*.swo
+
+tags
+tags.meta
+
+*.pyc*
+*.log
+
+*.sln
+*.suo
+*.csproj
+*.unityproj
+*.userprefs
+
+**/DOTween/DOTween.sln*
+**/DOTween/DOTween.userprefs*
+
+# Build and Release Folders
+bin-debug/
+bin-release/
+[Oo]bj/
+[Bb]in/
+
+# Other files and folders
+.settings/
+
+# Executables
+*.swf
+*.air
+*.ipa
+*.apk
+
+# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# should NOT be excluded as they contain compiler settings and other important
+# information for Eclipse / Flash Builder.
