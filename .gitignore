@@ -29,6 +29,7 @@ tags.meta
 *.sln
 *.suo
 *.csproj
+*.csproj.user
 *.unityproj
 *.userprefs
 
