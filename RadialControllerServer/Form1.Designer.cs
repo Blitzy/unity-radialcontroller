@@ -36,6 +36,7 @@
             this.labelRunTimeHeader = new System.Windows.Forms.Label();
             this.labelFrameCountHeader = new System.Windows.Forms.Label();
             this.labelFrameCount = new System.Windows.Forms.Label();
+            this.buttonSendTestMsg = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // labelServerStatus
@@ -120,11 +121,22 @@
             this.labelFrameCount.TabIndex = 6;
             this.labelFrameCount.Text = "[Frame count output here]";
             // 
+            // buttonSendTestMsg
+            // 
+            this.buttonSendTestMsg.Location = new System.Drawing.Point(15, 271);
+            this.buttonSendTestMsg.Name = "buttonSendTestMsg";
+            this.buttonSendTestMsg.Size = new System.Drawing.Size(117, 23);
+            this.buttonSendTestMsg.TabIndex = 8;
+            this.buttonSendTestMsg.Text = "Send Test Message";
+            this.buttonSendTestMsg.UseVisualStyleBackColor = true;
+            this.buttonSendTestMsg.Click += new System.EventHandler(this.buttonSendTestMsg_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(455, 333);
+            this.Controls.Add(this.buttonSendTestMsg);
             this.Controls.Add(this.labelFrameCountHeader);
             this.Controls.Add(this.labelFrameCount);
             this.Controls.Add(this.labelRunTimeHeader);
@@ -151,6 +163,7 @@
         private System.Windows.Forms.Label labelRunTimeHeader;
         private System.Windows.Forms.Label labelFrameCountHeader;
         private System.Windows.Forms.Label labelFrameCount;
+        private System.Windows.Forms.Button buttonSendTestMsg;
     }
 }
 

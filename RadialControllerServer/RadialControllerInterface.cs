@@ -17,11 +17,13 @@ using Windows.Storage;
 using Windows.Foundation;
 using Windows.Foundation.Metadata;
 using Windows.System;
+using System.Net.Sockets;
 
 namespace RadialControllerWinForm
 {
     public class RadialControllerInterface : IDisposable
     {
+
         private IntPtr windowHandle;
         private RadialController radialController;
 
@@ -138,6 +140,11 @@ namespace RadialControllerWinForm
             var config = GetConfig();
             config.ActiveControllerWhenMenuIsSuppressed = radialController;
             config.IsMenuSuppressed = suppressed;
+        }
+
+        private void StartUdpServer()
+        {
+
         }
 
         public void Dispose()

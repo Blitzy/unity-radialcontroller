@@ -4,14 +4,26 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using UnityEngine;
 
 namespace RadialController {
     public class RadialControllerWindowsBridge : IRadialControllerPlatformBridge
     {
+        public const int Port = 11000;
+
         private Process _serverProc;
+        public LocalUdpClient localUdpClient;
 
         public RadialControllerWindowsBridge() {
+            StartServerProcess();
+            localUdpClient = new LocalUdpClient(Port);
+            localUdpClient.Connect();
+        }
+
+        private void StartServerProcess() {
             var runningProcesses = Process.GetProcessesByName("RadialControllerServer");
 
             if (runningProcesses == null || runningProcesses.Length == 0) {
@@ -19,6 +31,7 @@ namespace RadialController {
                 var startInfo = new System.Diagnostics.ProcessStartInfo();
                 var exePath = System.IO.Path.Combine(Application.streamingAssetsPath, "RadialControllerServer.exe");
                 startInfo.FileName = exePath;
+                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
 
                 _serverProc = Process.Start(startInfo);
             } else {

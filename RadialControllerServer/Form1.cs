@@ -20,11 +20,17 @@ namespace RadialControllerWinForm
 {
     public partial class Form1 : Form
     {
-        RadialControllerInterface radialInterface;
+        public const int Port = 27015;
+
+        public RadialControllerInterface radialInterface;
+        public LocalUdpClient localUdpClient;
 
         public Form1()
         {
             InitializeComponent();
+
+            localUdpClient = new LocalUdpClient(Port);
+            localUdpClient.Connect();
 
             this.labelServerStatus.Text = "Server has not started.";
         }
@@ -117,6 +123,11 @@ namespace RadialControllerWinForm
         {
             var timestamp = DateTime.Now.ToLongTimeString();
             this.labelRadialOutput.Text = string.Format("[{0}] button clicked", timestamp);
+        }
+
+        private void buttonSendTestMsg_Click(object sender, EventArgs e)
+        {
+            localUdpClient.SendMessage("hello from the server!");
         }
     }
 }
