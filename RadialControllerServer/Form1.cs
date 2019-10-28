@@ -21,6 +21,7 @@ namespace RadialControllerWinForm
     public partial class Form1 : Form
     {
         public const int Port = 27020;
+        public const string VersionString = "v0.1.0 (October 28, 2019 1:00PM EST)";
 
         private const string EventId_ControlAcquired = "radial_controller_control_acquired";
         private const string EventId_ControlLost = "radial_controller_control_lost";
@@ -41,6 +42,7 @@ namespace RadialControllerWinForm
             localUdpClient.ignoreDataFromClient = true;
             localUdpClient.onDataReceived += OnDataReceived;
 
+            this.labelServerVersion.Text = VersionString;
             this.labelServerStatus.Text = "Server is communicating on port " + Port;
             this.labelLastServerMessage.Text = "None";
         }
