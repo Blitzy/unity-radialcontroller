@@ -13,7 +13,7 @@ namespace RadialController {
         public UnityEvent onButtonPressed;
         public UnityEvent onButtonReleased;
         public UnityEvent onButtonHolding;
-        public DoubleEvent onRotationChanged;
+        public FloatEvent onRotationChanged;
         public UnityEvent onControlAcquired;
         public UnityEvent onControlLost;
 
@@ -61,7 +61,7 @@ namespace RadialController {
             }
         }
 
-        private void OnRotationChanged(double deltaDegrees) {
+        private void OnRotationChanged(float deltaDegrees) {
             if (onRotationChanged != null) {
                 onRotationChanged.Invoke(deltaDegrees);
             }
@@ -107,7 +107,7 @@ namespace RadialController {
     }
 
     [System.Serializable]
-    public class DoubleEvent : UnityEvent<double> {
+    public class FloatEvent : UnityEvent<float> {
     }
 
 }

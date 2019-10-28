@@ -31,7 +31,7 @@ namespace RadialController {
         public event Action onButtonPressed;
         public event Action onButtonReleased;
         public event Action onButtonHolding;
-        public event Action<double> onRotationChanged;
+        public event Action<float> onRotationChanged;
         public event Action onControlAcquired;
         public event Action onControlLost;
 
@@ -62,9 +62,9 @@ namespace RadialController {
         }
 
         private void OnDataReceived(LocalUdpPacket packet) {
-            string msg = "Data received from " + packet.senderId + ":\n";
-            msg += "  [data]: " + MiniJSON.Json.Serialize(packet.data);
-            UnityEngine.Debug.Log(msg);
+            // string msg = "Data received from " + packet.senderId + ":\n";
+            // msg += "  [data]: " + MiniJSON.Json.Serialize(packet.data);
+            // UnityEngine.Debug.Log(msg);
 
             if (packet.senderId == Server_SenderId) {
                 // Queue the packet up to be process on the main thread in the next update frame.
@@ -93,7 +93,7 @@ namespace RadialController {
                         case EventId_RotationChanged: 
                             double deltaDegrees = System.Convert.ToDouble(packet.data["delta_degrees"]);
                             if (onRotationChanged != null) {
-                                onRotationChanged(deltaDegrees);
+                                onRotationChanged((float)deltaDegrees);
                             }
                             break;
                         case EventId_ButtonPressed:

@@ -10,7 +10,7 @@ namespace RadialController {
          event Action onButtonPressed;
          event Action onButtonReleased;
          event Action onButtonHolding;
-         event Action<double> onRotationChanged;
+         event Action<float> onRotationChanged;
          event Action onControlAcquired;
          event Action onControlLost;
         
