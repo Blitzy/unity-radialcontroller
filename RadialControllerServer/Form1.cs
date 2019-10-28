@@ -20,7 +20,7 @@ namespace RadialControllerWinForm
 {
     public partial class Form1 : Form
     {
-        public const int Port = 27015;
+        public const int Port = 27020;
 
         public RadialControllerInterface radialInterface;
         public LocalUdpClient localUdpClient;
@@ -29,10 +29,12 @@ namespace RadialControllerWinForm
         {
             InitializeComponent();
 
-            localUdpClient = new LocalUdpClient(Port);
-            localUdpClient.Connect();
+            localUdpClient = new LocalUdpClient("RadialControllerServer", Port);
+            localUdpClient.ignoreDataFromClient = true;
+            localUdpClient.onDataReceived += OnDataReceived;
 
-            this.labelServerStatus.Text = "Server has not started.";
+            this.labelServerStatus.Text = "Server is communicating on port " + Port;
+            this.labelLastServerMessage.Text = "None";
         }
 
         protected override void OnLoad(EventArgs e)
@@ -57,15 +59,11 @@ namespace RadialControllerWinForm
         {
             TimeSpan timespan = TimeSpan.FromMilliseconds(ApplicationIdleHelper.ElapsedTimeMS);
             this.labelRunTime.Text = timespan.ToString();
-
-            this.labelFrameCount.Text = ApplicationIdleHelper.FrameCount.ToString();
         }
 
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-
-            Application.Idle -= Application_Idle;
 
             radialInterface.onButtonClicked -= OnRadialButtonClicked;
             radialInterface.onButtonPressed -= OnRadialButtonPressed;
@@ -79,8 +77,16 @@ namespace RadialControllerWinForm
             radialInterface = null;
         }
 
-        private void Application_Idle(object sender, EventArgs e)
+        private void OnDataReceived(LocalUdpPacket packet)
         {
+            Invoke(new Action(() => {
+                string msg = "Data received from " + packet.senderId + ":\n";
+                msg += "  [data]: " + MiniJSON.Json.Serialize(packet.data);
+                this.labelLastServerMessage.Text = msg;
+                Console.WriteLine(msg);
+            }),
+                null
+            );
         }
 
         private void OnRadialRotationChanged(double deltaDegrees)
@@ -127,7 +133,11 @@ namespace RadialControllerWinForm
 
         private void buttonSendTestMsg_Click(object sender, EventArgs e)
         {
-            localUdpClient.SendMessage("hello from the server!");
+            var data = new Dictionary<string, object>();
+            data["message"] = "hello from the server";
+            data["time"] = DateTime.Now.ToString();
+
+            localUdpClient.Send(data);
         }
     }
 }

@@ -142,11 +142,6 @@ namespace RadialControllerWinForm
             config.IsMenuSuppressed = suppressed;
         }
 
-        private void StartUdpServer()
-        {
-
-        }
-
         public void Dispose()
         {
             UnsubscribeToControllerCallbacks();

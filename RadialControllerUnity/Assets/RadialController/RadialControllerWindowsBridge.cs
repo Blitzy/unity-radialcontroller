@@ -12,15 +12,16 @@ using UnityEngine;
 namespace RadialController {
     public class RadialControllerWindowsBridge : IRadialControllerPlatformBridge
     {
-        public const int Port = 11000;
+        public const int Port = 27020;
 
         private Process _serverProc;
         public LocalUdpClient localUdpClient;
 
         public RadialControllerWindowsBridge() {
             StartServerProcess();
-            localUdpClient = new LocalUdpClient(Port);
-            localUdpClient.Connect();
+            localUdpClient = new LocalUdpClient("RadialControllerUnityReciever", Port);
+            localUdpClient.ignoreDataFromClient = true;
+            localUdpClient.onDataReceived += OnDataReceived;
         }
 
         private void StartServerProcess() {
@@ -40,12 +41,23 @@ namespace RadialController {
             }
         }
 
+        private void OnDataReceived(LocalUdpPacket packet) {
+            string msg = "Data received from " + packet.senderId + ":\n";
+            msg += "  [data]: " + MiniJSON.Json.Serialize(packet.data);
+            UnityEngine.Debug.Log(msg);
+        }
+
         public void Update() {
         }
 
         public void Dispose() {
             if (_serverProc != null) {
                 _serverProc.Kill();
+            }
+
+            if (localUdpClient != null){
+                localUdpClient.onDataReceived -= OnDataReceived;
+                localUdpClient.Dispose();
             }
         }
     }

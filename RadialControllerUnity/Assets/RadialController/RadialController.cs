@@ -33,7 +33,12 @@ namespace RadialController {
 
         public void SendTestMessage() {
             var windowsBridge = (RadialControllerWindowsBridge)_bridge;
-            windowsBridge.localUdpClient.SendMessage("hello from unity!");
+
+            var data = new Dictionary<string, object>();
+            data["message"] = "hello from unity!";
+            data["time"] = System.DateTime.Now.ToString();
+
+            windowsBridge.localUdpClient.Send(data);
         }
 
         private static IRadialControllerPlatformBridge CreatePlatformBridge() {

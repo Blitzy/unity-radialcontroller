@@ -34,9 +34,9 @@
             this.labelServerStatusHeader = new System.Windows.Forms.Label();
             this.labelRunTime = new System.Windows.Forms.Label();
             this.labelRunTimeHeader = new System.Windows.Forms.Label();
-            this.labelFrameCountHeader = new System.Windows.Forms.Label();
-            this.labelFrameCount = new System.Windows.Forms.Label();
             this.buttonSendTestMsg = new System.Windows.Forms.Button();
+            this.labelLastServerMessageHeader = new System.Windows.Forms.Label();
+            this.labelLastServerMessage = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // labelServerStatus
@@ -52,7 +52,7 @@
             // 
             this.labelRadialOutputHeader.AutoSize = true;
             this.labelRadialOutputHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelRadialOutputHeader.Location = new System.Drawing.Point(12, 195);
+            this.labelRadialOutputHeader.Location = new System.Drawing.Point(12, 134);
             this.labelRadialOutputHeader.Name = "labelRadialOutputHeader";
             this.labelRadialOutputHeader.Size = new System.Drawing.Size(143, 13);
             this.labelRadialOutputHeader.TabIndex = 1;
@@ -62,7 +62,7 @@
             // 
             this.labelRadialOutput.AutoSize = true;
             this.labelRadialOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelRadialOutput.Location = new System.Drawing.Point(12, 217);
+            this.labelRadialOutput.Location = new System.Drawing.Point(12, 156);
             this.labelRadialOutput.MaximumSize = new System.Drawing.Size(200, 0);
             this.labelRadialOutput.Name = "labelRadialOutput";
             this.labelRadialOutput.Size = new System.Drawing.Size(146, 13);
@@ -100,30 +100,9 @@
             this.labelRunTimeHeader.TabIndex = 5;
             this.labelRunTimeHeader.Text = "Run Time";
             // 
-            // labelFrameCountHeader
-            // 
-            this.labelFrameCountHeader.AutoSize = true;
-            this.labelFrameCountHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelFrameCountHeader.Location = new System.Drawing.Point(12, 133);
-            this.labelFrameCountHeader.Name = "labelFrameCountHeader";
-            this.labelFrameCountHeader.Size = new System.Drawing.Size(78, 13);
-            this.labelFrameCountHeader.TabIndex = 7;
-            this.labelFrameCountHeader.Text = "Frame Count";
-            // 
-            // labelFrameCount
-            // 
-            this.labelFrameCount.AutoSize = true;
-            this.labelFrameCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelFrameCount.Location = new System.Drawing.Point(12, 157);
-            this.labelFrameCount.MaximumSize = new System.Drawing.Size(200, 0);
-            this.labelFrameCount.Name = "labelFrameCount";
-            this.labelFrameCount.Size = new System.Drawing.Size(129, 13);
-            this.labelFrameCount.TabIndex = 6;
-            this.labelFrameCount.Text = "[Frame count output here]";
-            // 
             // buttonSendTestMsg
             // 
-            this.buttonSendTestMsg.Location = new System.Drawing.Point(15, 271);
+            this.buttonSendTestMsg.Location = new System.Drawing.Point(15, 207);
             this.buttonSendTestMsg.Name = "buttonSendTestMsg";
             this.buttonSendTestMsg.Size = new System.Drawing.Size(117, 23);
             this.buttonSendTestMsg.TabIndex = 8;
@@ -131,14 +110,34 @@
             this.buttonSendTestMsg.UseVisualStyleBackColor = true;
             this.buttonSendTestMsg.Click += new System.EventHandler(this.buttonSendTestMsg_Click);
             // 
+            // labelLastServerMessageHeader
+            // 
+            this.labelLastServerMessageHeader.AutoSize = true;
+            this.labelLastServerMessageHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelLastServerMessageHeader.Location = new System.Drawing.Point(12, 245);
+            this.labelLastServerMessageHeader.Name = "labelLastServerMessageHeader";
+            this.labelLastServerMessageHeader.Size = new System.Drawing.Size(184, 13);
+            this.labelLastServerMessageHeader.TabIndex = 7;
+            this.labelLastServerMessageHeader.Text = "Last Server Message Received";
+            // 
+            // labelLastServerMessage
+            // 
+            this.labelLastServerMessage.AutoSize = true;
+            this.labelLastServerMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelLastServerMessage.Location = new System.Drawing.Point(12, 269);
+            this.labelLastServerMessage.Name = "labelLastServerMessage";
+            this.labelLastServerMessage.Size = new System.Drawing.Size(187, 13);
+            this.labelLastServerMessage.TabIndex = 6;
+            this.labelLastServerMessage.Text = "[Last server message received output]";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(455, 333);
             this.Controls.Add(this.buttonSendTestMsg);
-            this.Controls.Add(this.labelFrameCountHeader);
-            this.Controls.Add(this.labelFrameCount);
+            this.Controls.Add(this.labelLastServerMessageHeader);
+            this.Controls.Add(this.labelLastServerMessage);
             this.Controls.Add(this.labelRunTimeHeader);
             this.Controls.Add(this.labelRunTime);
             this.Controls.Add(this.labelServerStatusHeader);
@@ -161,9 +160,9 @@
         private System.Windows.Forms.Label labelServerStatusHeader;
         private System.Windows.Forms.Label labelRunTime;
         private System.Windows.Forms.Label labelRunTimeHeader;
-        private System.Windows.Forms.Label labelFrameCountHeader;
-        private System.Windows.Forms.Label labelFrameCount;
         private System.Windows.Forms.Button buttonSendTestMsg;
+        private System.Windows.Forms.Label labelLastServerMessageHeader;
+        private System.Windows.Forms.Label labelLastServerMessage;
     }
 }
 
