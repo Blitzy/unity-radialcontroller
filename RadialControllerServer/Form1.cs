@@ -22,6 +22,14 @@ namespace RadialControllerWinForm
     {
         public const int Port = 27020;
 
+        private const string EventId_ControlAcquired = "radial_controller_control_acquired";
+        private const string EventId_ControlLost = "radial_controller_control_lost";
+        private const string EventId_ButtonClicked = "radial_controller_button_clicked";
+        private const string EventId_ButtonPressed = "radial_controller_button_pressed";
+        private const string EventId_ButtonHolding = "radial_controller_button_holding";
+        private const string EventId_ButtonReleased = "radial_controller_button_released";
+        private const string EventId_RotationChanged = "radial_controller_rotation_changed";
+
         public RadialControllerInterface radialInterface;
         public LocalUdpClient localUdpClient;
 
@@ -93,42 +101,71 @@ namespace RadialControllerWinForm
         {
             var timestamp = DateTime.Now.ToLongTimeString();
             this.labelRadialOutput.Text = string.Format("[{0}] rotation changed: {1}", timestamp, deltaDegrees);
+
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_RotationChanged;
+            data["delta_degrees"] = deltaDegrees;
+            localUdpClient.Send(data);
         }
 
         private void OnRadialControlLost()
         {
             var timestamp = DateTime.Now.ToLongTimeString();
             this.labelRadialOutput.Text = string.Format("[{0}] control lost", timestamp);
+
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_ControlLost;
+            localUdpClient.Send(data);
         }
 
         private void OnRadialControlAcquired()
         {
             var timestamp = DateTime.Now.ToLongTimeString();
             this.labelRadialOutput.Text = string.Format("[{0}] control acquired", timestamp);
+
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_ControlAcquired;
+            localUdpClient.Send(data);
         }
 
         private void OnRadialButtonReleased()
         {
             var timestamp = DateTime.Now.ToLongTimeString();
             this.labelRadialOutput.Text = string.Format("[{0}] button released", timestamp);
+
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_ButtonReleased;
+            localUdpClient.Send(data);
         }
 
         private void OnRadialButtonHolding()
         {
             var timestamp = DateTime.Now.ToLongTimeString();
             this.labelRadialOutput.Text = string.Format("[{0}] button holding", timestamp);
+
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_ButtonHolding;
+            localUdpClient.Send(data);
         }
 
         private void OnRadialButtonPressed()
         {
             var timestamp = DateTime.Now.ToLongTimeString();
             this.labelRadialOutput.Text = string.Format("[{0}] button pressed", timestamp);
+
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_ButtonPressed;
+            localUdpClient.Send(data);
         }
 
         private void OnRadialButtonClicked()
         {
             var timestamp = DateTime.Now.ToLongTimeString();
             this.labelRadialOutput.Text = string.Format("[{0}] button clicked", timestamp);
+
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_ButtonClicked;
+            localUdpClient.Send(data);
         }
 
         private void buttonSendTestMsg_Click(object sender, EventArgs e)

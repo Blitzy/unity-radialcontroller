@@ -1,8 +1,18 @@
+using System;
+
 namespace RadialController {
     /// <summary>
     /// Common interface that all radial controller platform bridges implement.
     /// </summary>
     public interface IRadialControllerPlatformBridge {
+
+         event Action onButtonClicked;
+         event Action onButtonPressed;
+         event Action onButtonReleased;
+         event Action onButtonHolding;
+         event Action<double> onRotationChanged;
+         event Action onControlAcquired;
+         event Action onControlLost;
         
         /// <summary>
         /// Regular frame update from unity, managed by the radial controller component that creates this platform bridge.

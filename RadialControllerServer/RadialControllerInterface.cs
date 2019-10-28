@@ -46,7 +46,7 @@ namespace RadialControllerWinForm
 
         private void CreateController()
         {
-            Console.WriteLine("[RadialControllerInterface] Creating radial controller");
+            //Console.WriteLine("[RadialControllerInterface] Creating radial controller");
             IRadialControllerInterop interop = (IRadialControllerInterop)System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeMarshal.GetActivationFactory(typeof(RadialController));
             Guid guid = typeof(RadialController).GetInterface("IRadialController").GUID;
             radialController = interop.CreateForWindow(this.windowHandle, ref guid);
@@ -54,7 +54,7 @@ namespace RadialControllerWinForm
 
         private void SubscribeToControllerCallbacks()
         {
-            Console.WriteLine("[RadialControllerInterface] Subscribing to radial controller callbacks");
+            //Console.WriteLine("[RadialControllerInterface] Subscribing to radial controller callbacks");
             radialController.ControlLost += RadialController_ControlLost;
             radialController.ControlAcquired += RadialController_ControlAcquired;
             radialController.ButtonPressed += RadialController_ButtonPressed;
@@ -66,7 +66,7 @@ namespace RadialControllerWinForm
 
         private void UnsubscribeToControllerCallbacks()
         {
-            Console.WriteLine("[RadialControllerInterface] Unsubscribing from radial controller callbacks");
+            //Console.WriteLine("[RadialControllerInterface] Unsubscribing from radial controller callbacks");
             radialController.ControlLost -= RadialController_ControlLost;
             radialController.ControlAcquired -= RadialController_ControlAcquired;
             radialController.ButtonPressed -= RadialController_ButtonPressed;
@@ -78,48 +78,48 @@ namespace RadialControllerWinForm
 
         private void RadialController_ControlAcquired(RadialController sender, RadialControllerControlAcquiredEventArgs args)
         {
-            Console.WriteLine("[RadialControllerInterface] control acquired");
+            //Console.WriteLine("[RadialControllerInterface] control acquired");
             if (onControlAcquired != null)
                 onControlAcquired();
         }
 
         private void RadialController_ControlLost(RadialController sender, object args)
         {
-            Console.WriteLine("[RadialControllerInterface] control lost");
+            //Console.WriteLine("[RadialControllerInterface] control lost");
             if (onControlLost != null)
                 onControlLost();
         }
 
         private void RadialController_RotationChanged(RadialController sender, RadialControllerRotationChangedEventArgs args)
         {
-            Console.WriteLine("[RadialControllerInterface] rotation changed: " + args.RotationDeltaInDegrees);
+            //Console.WriteLine("[RadialControllerInterface] rotation changed: " + args.RotationDeltaInDegrees);
             if (onRotationChanged != null)
                 onRotationChanged(args.RotationDeltaInDegrees);
         }
         private void RadialController_ButtonPressed(RadialController sender, RadialControllerButtonPressedEventArgs args)
         {
-            Console.WriteLine("[RadialControllerInterface] button pressed");
+            //Console.WriteLine("[RadialControllerInterface] button pressed");
             if (onButtonPressed != null)
                 onButtonPressed();
         }
 
         private void RadialController_ButtonReleased(RadialController sender, RadialControllerButtonReleasedEventArgs args)
         {
-            Console.WriteLine("[RadialControllerInterface] button released");
+            //Console.WriteLine("[RadialControllerInterface] button released");
             if (onButtonReleased != null)
                 onButtonReleased();
         }
 
         private void RadialController_ButtonHolding(RadialController sender, RadialControllerButtonHoldingEventArgs args)
         {
-            Console.WriteLine("[RadialControllerInterface] button holding");
+            //Console.WriteLine("[RadialControllerInterface] button holding");
             if (onButtonHolding != null)
                 onButtonHolding();
         }
 
         private void RadialController_ButtonClicked(RadialController sender, RadialControllerButtonClickedEventArgs args)
         {
-            Console.WriteLine("[RadialControllerInterface] button clicked");
+            //Console.WriteLine("[RadialControllerInterface] button clicked");
             if (onButtonClicked != null)
                 onButtonClicked();
         }
@@ -136,7 +136,7 @@ namespace RadialControllerWinForm
 
         private void MenuSuppressed(bool suppressed)
         {
-            Console.WriteLine("[RadialControllerInterface] menu suppressed: " + suppressed);
+            //Console.WriteLine("[RadialControllerInterface] menu suppressed: " + suppressed);
             var config = GetConfig();
             config.ActiveControllerWhenMenuIsSuppressed = radialController;
             config.IsMenuSuppressed = suppressed;
