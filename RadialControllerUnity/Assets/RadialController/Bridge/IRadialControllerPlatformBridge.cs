@@ -24,5 +24,15 @@ namespace RadialController {
         /// The bridge should cleanup any objects and unmanaged hooks it has created.
         /// </summary>
         void Dispose();
+
+        /// <summary>
+        /// Tell the platform bridge when the application has gained or lost focus.
+        /// </summary>
+        void OnApplicationFocus(bool focused);
+
+        /// <summary>
+        /// Tell the platform bridge when the application has been paused or resumed.
+        /// </summary>
+        void OnApplicationPause(bool paused);
     }
 }

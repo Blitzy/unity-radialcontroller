@@ -8,6 +8,10 @@ namespace RadialController {
     public class RadialController : MonoBehaviour {
 
         private IRadialControllerPlatformBridge _bridge;
+        private bool _allowClickEvent = true;
+
+        [Tooltip("Default behaviour of the radial controller has the clicked event being sent even if the holding is activated. This flag allows you to alter that behaviour.")]
+        public bool sendClickIfHolding = true;
 
         public UnityEvent onButtonClicked;
         public UnityEvent onButtonPressed;
@@ -68,6 +72,11 @@ namespace RadialController {
         }
 
         private void OnButtonHolding() {
+            if (!sendClickIfHolding) {
+                // If 'send click if holding' is disabled and the holding event was received, do not send out the click event.
+                _allowClickEvent = false;
+            }
+
             if (onButtonHolding != null) {
                 onButtonHolding.Invoke();
             }
@@ -80,29 +89,32 @@ namespace RadialController {
         }
 
         private void OnButtonPressed() {
+            // Reset the allow click event flag every time the Pressed event is received.
+            _allowClickEvent = true;
+
             if (onButtonPressed != null) {
                 onButtonPressed.Invoke();
             }
         }
 
         private void OnButtonClicked() {
-            if (onButtonClicked != null) {
-                onButtonClicked.Invoke();
+            if (_allowClickEvent) { 
+                if (onButtonClicked != null) {
+                    onButtonClicked.Invoke();
+                }
             }
         }
 
-        public void SendTestMessage() {
-            var windowsBridge = (RadialControllerWindowsBridge)_bridge;
-
-            var data = new Dictionary<string, object>();
-            data["message"] = "hello from unity!";
-            data["time"] = System.DateTime.Now.ToString();
-
-            windowsBridge.localUdpClient.Send(data);
+        private void OnApplicationFocus(bool focused) {
+            if (_bridge != null) {
+                _bridge.OnApplicationFocus(focused);
+            }
         }
 
-        private static IRadialControllerPlatformBridge CreatePlatformBridge() {
-            return null;
+        private void OnApplicationPause(bool paused) {
+            if (_bridge != null) {
+                _bridge.OnApplicationPause(paused);
+            }
         }
     }
 

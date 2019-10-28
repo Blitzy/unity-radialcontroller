@@ -25,7 +25,7 @@ namespace RadialController {
 
         private Process _serverProc;
         private Queue<LocalUdpPacket> _packetQueue;
-        public LocalUdpClient localUdpClient;
+        private LocalUdpClient _localUdpClient;
 
         public event Action onButtonClicked;
         public event Action onButtonPressed;
@@ -38,10 +38,9 @@ namespace RadialController {
         public RadialControllerWindowsBridge() {
             _packetQueue = new Queue<LocalUdpPacket>();
 
-            StartServerProcess();
-            localUdpClient = new LocalUdpClient("RadialControllerUnityReciever", Port);
-            localUdpClient.ignoreDataFromClient = true;
-            localUdpClient.onDataReceived += OnDataReceived;
+            _localUdpClient = new LocalUdpClient("RadialControllerUnityReciever", Port);
+            _localUdpClient.ignoreDataFromClient = true;
+            _localUdpClient.onDataReceived += OnDataReceived;
         }
 
         private void StartServerProcess() {
@@ -58,6 +57,17 @@ namespace RadialController {
             } else {
                 // Use one of the already running radial controller processes.
                 _serverProc = runningProcesses[0];
+            }
+        }
+
+        private void KillServerProcess() {
+            if (_serverProc != null) {
+                try {
+                    _serverProc.Kill();
+                    _serverProc.WaitForExit();
+                } catch {
+                    UnityEngine.Debug.Log("[RadialControllerWindowsBridge] Tried killing server process but it was already killed.");
+                }
             }
         }
 
@@ -78,60 +88,87 @@ namespace RadialController {
                     LocalUdpPacket packet = _packetQueue.Dequeue();
 
                     // Process the packet's event data.
-                    string eventId = (string)packet.data["event_id"];
-                    switch(eventId) {
-                        case EventId_ControlAcquired:
-                            if (onControlAcquired != null) {
-                                onControlAcquired();
-                            }
-                            break;
-                        case EventId_ControlLost:
-                            if (onControlLost != null) {
-                                onControlLost();
-                            }
-                            break;
-                        case EventId_RotationChanged: 
-                            double deltaDegrees = System.Convert.ToDouble(packet.data["delta_degrees"]);
-                            if (onRotationChanged != null) {
-                                onRotationChanged((float)deltaDegrees);
-                            }
-                            break;
-                        case EventId_ButtonPressed:
-                            if (onButtonPressed != null) {
-                                onButtonPressed();
-                            }
-                            break;
-                        case EventId_ButtonHolding:
-                            if (onButtonHolding != null) {
-                                onButtonHolding();
-                            }
-                            break;
-                        case EventId_ButtonReleased:
-                            if (onButtonReleased != null) {
-                                onButtonReleased();
-                            }
-                            break;
-                        case EventId_ButtonClicked:
-                            if (onButtonClicked != null) {
-                                onButtonClicked();
-                            }
-                            break;
-                        default:
-                            UnityEngine.Debug.LogWarning("[RadialControllerWindowsBridge] Event Id " + eventId + " is not implemented.");
-                            break;
+                    string eventId = null;
+
+                    if (packet.data.ContainsKey("event_id")) {
+                        eventId = packet.data["event_id"] as string;
+                    }
+
+                    if (eventId != null) {
+                        switch(eventId) {
+                            case EventId_ControlAcquired:
+                                if (onControlAcquired != null) {
+                                    onControlAcquired();
+                                }
+                                break;
+                            case EventId_ControlLost:
+                                if (onControlLost != null) {
+                                    onControlLost();
+                                }
+                                break;
+                            case EventId_RotationChanged: 
+                                double deltaDegrees = System.Convert.ToDouble(packet.data["delta_degrees"]);
+                                if (onRotationChanged != null) {
+                                    onRotationChanged((float)deltaDegrees);
+                                }
+                                break;
+                            case EventId_ButtonPressed:
+                                if (onButtonPressed != null) {
+                                    onButtonPressed();
+                                }
+                                break;
+                            case EventId_ButtonHolding:
+                                if (onButtonHolding != null) {
+                                    onButtonHolding();
+                                }
+                                break;
+                            case EventId_ButtonReleased:
+                                if (onButtonReleased != null) {
+                                    onButtonReleased();
+                                }
+                                break;
+                            case EventId_ButtonClicked:
+                                if (onButtonClicked != null) {
+                                    onButtonClicked();
+                                }
+                                break;
+                            default:
+                                UnityEngine.Debug.LogWarning("[RadialControllerWindowsBridge] Event Id " + eventId + " is not implemented.");
+                                break;
+                        }
+                    } else {
+                        // This is not a normal radial controller event from the server. Lets just throw this one to the Unity debug console.
+                        string msg = "Extra data received from " + packet.senderId + ":\n";
+                        msg += "  [data]: " + MiniJSON.Json.Serialize(packet.data);
+                        UnityEngine.Debug.Log(msg);
                     }
                 }
             }
         }
 
-        public void Dispose() {
-            if (_serverProc != null) {
-                _serverProc.Kill();
-            }
+        public void OnApplicationFocus(bool focused) {
+            if (focused) {
+                if (_serverProc != null) {
+                    // Unity application has gained focus, this causes the radial controller server application to stop
+                    // receiving events from Windows. Restart the server process to get radial controller input working again.
 
-            if (localUdpClient != null){
-                localUdpClient.onDataReceived -= OnDataReceived;
-                localUdpClient.Dispose();
+                    // TODO: It would be much better to give the already running process focus again, but this will be
+                    // the quick and dirty workaround for now.
+                    KillServerProcess();
+                }
+                StartServerProcess();
+            }
+        }
+
+        public void OnApplicationPause(bool paused){
+        }
+
+        public void Dispose() {
+            KillServerProcess();
+
+            if (_localUdpClient != null){
+                _localUdpClient.onDataReceived -= OnDataReceived;
+                _localUdpClient.Dispose();
             }
         }
     }
