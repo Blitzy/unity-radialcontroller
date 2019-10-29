@@ -1,6 +1,9 @@
 # Radial Controller for Unity
 This projects enables the use of the [Microsoft Radial Controller](https://docs.microsoft.com/en-us/uwp/api/Windows.UI.Input.RadialController) inside of a non-UWP Unity Windows Desktop application.
 
+
+[View the Changelog](CHANGELOG.md) for details changes/improvements in each version.
+
 ## What is this for?
 I needed to get close to native functionality of the [Microsoft Surface Dial](https://docs.microsoft.com/en-us/windows/uwp/design/input/windows-wheel-interactions) working inside of a Unity application that is **NOT** built for [UWP](https://docs.microsoft.com/en-us/windows/uwp/get-started/universal-application-platform-guide). 
 
