@@ -1978,8 +1978,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sendClickIfHolding: 0
-  rotationResolutionInDegrees: 20
-  useAutoHapticFeedback: 0
+  rotationResolutionInDegrees: 10
+  useAutoHapticFeedback: 1
   onButtonClicked:
     m_PersistentCalls:
       m_Calls:
