@@ -21,8 +21,9 @@ namespace RadialControllerWinForm
     public partial class Form1 : Form
     {
         public const int Port = 27020;
-        public const string VersionString = "v0.1.0 (October 28, 2019 2:54PM EST)";
+        public const string VersionString = "v0.1.1 (October 28, 2019 2:54PM EST)";
 
+        private const string Client_SenderId = "RadialControllerUnityReceiver";
         private const string EventId_ControlAcquired = "radial_controller_control_acquired";
         private const string EventId_ControlLost = "radial_controller_control_lost";
         private const string EventId_ButtonClicked = "radial_controller_button_clicked";
@@ -30,8 +31,10 @@ namespace RadialControllerWinForm
         private const string EventId_ButtonHolding = "radial_controller_button_holding";
         private const string EventId_ButtonReleased = "radial_controller_button_released";
         private const string EventId_RotationChanged = "radial_controller_rotation_changed";
+        private const string EventId_RotationResolutionInDegrees = "radial_controller_rotation_resolution_in_degrees";
 
-        public RadialControllerInterface radialInterface;
+        private IntPtr windowHandle;
+        private RadialController radialController;
         public LocalUdpClient localUdpClient;
 
         public Form1()
@@ -55,14 +58,9 @@ namespace RadialControllerWinForm
 
             this.labelRadialOutput.Text = "Waiting to acquire radial controller";
 
-            radialInterface = new RadialControllerInterface(this.Handle);
-            radialInterface.onButtonClicked += OnRadialButtonClicked;
-            radialInterface.onButtonPressed += OnRadialButtonPressed;
-            radialInterface.onButtonReleased += OnRadialButtonReleased;
-            radialInterface.onButtonHolding += OnRadialButtonHolding;
-            radialInterface.onControlAcquired += OnRadialControlAcquired;
-            radialInterface.onControlLost += OnRadialControlLost;
-            radialInterface.onRotationChanged += OnRadialRotationChanged;
+            CreateController();
+            SubscribeToControllerCallbacks();
+            MenuSuppressed(true);
         }
 
         private void OnIdle()
@@ -75,16 +73,43 @@ namespace RadialControllerWinForm
         {
             base.OnClosed(e);
 
-            radialInterface.onButtonClicked -= OnRadialButtonClicked;
-            radialInterface.onButtonPressed -= OnRadialButtonPressed;
-            radialInterface.onButtonReleased -= OnRadialButtonReleased;
-            radialInterface.onButtonHolding -= OnRadialButtonHolding;
-            radialInterface.onControlAcquired -= OnRadialControlAcquired;
-            radialInterface.onControlLost -= OnRadialControlLost;
-            radialInterface.onRotationChanged -= OnRadialRotationChanged;
+            ApplicationIdleHelper.OnIdle -= OnIdle;
 
-            radialInterface.Dispose();
-            radialInterface = null;
+            UnsubscribeToControllerCallbacks();
+            radialController = null;
+        }
+
+        private void CreateController()
+        {
+            //Console.WriteLine("Creating radial controller");
+            this.windowHandle = this.Handle;
+            IRadialControllerInterop interop = (IRadialControllerInterop)System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeMarshal.GetActivationFactory(typeof(RadialController));
+            Guid guid = typeof(RadialController).GetInterface("IRadialController").GUID;
+            radialController = interop.CreateForWindow(this.windowHandle, ref guid);
+        }
+
+        private void SubscribeToControllerCallbacks()
+        {
+            //Console.WriteLine("Subscribing to radial controller callbacks");
+            radialController.ControlLost += RadialController_ControlLost;
+            radialController.ControlAcquired += RadialController_ControlAcquired;
+            radialController.ButtonPressed += RadialController_ButtonPressed;
+            radialController.ButtonReleased += RadialController_ButtonReleased;
+            radialController.ButtonHolding += RadialController_ButtonHolding;
+            radialController.ButtonClicked += RadialController_ButtonClicked;
+            radialController.RotationChanged += RadialController_RotationChanged;
+        }
+
+        private void UnsubscribeToControllerCallbacks()
+        {
+            //Console.WriteLine("Unsubscribing from radial controller callbacks");
+            radialController.ControlLost -= RadialController_ControlLost;
+            radialController.ControlAcquired -= RadialController_ControlAcquired;
+            radialController.ButtonPressed -= RadialController_ButtonPressed;
+            radialController.ButtonReleased -= RadialController_ButtonReleased;
+            radialController.ButtonHolding -= RadialController_ButtonHolding;
+            radialController.ButtonClicked -= RadialController_ButtonClicked;
+            radialController.RotationChanged -= RadialController_RotationChanged;
         }
 
         private void OnDataReceived(LocalUdpPacket packet)
@@ -93,81 +118,148 @@ namespace RadialControllerWinForm
                 string msg = "Data received from " + packet.senderId + ":\n";
                 msg += "  [data]: " + MiniJSON.Json.Serialize(packet.data);
                 this.labelLastServerMessage.Text = msg;
-                Console.WriteLine(msg);
+
+                if (packet.senderId == Client_SenderId)
+                {
+                    // Process the packet's event data.
+                    string eventId = null;
+
+                    if (packet.data.ContainsKey("event_id"))
+                    {
+                        eventId = packet.data["event_id"] as string;
+                    }
+
+                    if (eventId != null)
+                    {
+                        switch (eventId)
+                        {
+                            case EventId_RotationResolutionInDegrees:
+                                double degrees = Convert.ToDouble(packet.data["degrees"]);
+                                radialController.RotationResolutionInDegrees = degrees;
+                                break;
+                            default:
+                                Console.WriteLine("Event Id " + eventId + " is not implemented.");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // This is not a normal radial controller event from the client. Lets just throw this one to the console.
+                        Console.WriteLine(msg);
+                    }
+                }
             }),
                 null
             );
         }
 
-        private void OnRadialRotationChanged(double deltaDegrees)
+        private void RadialController_ControlAcquired(RadialController sender, RadialControllerControlAcquiredEventArgs args)
         {
-            var timestamp = DateTime.Now.ToLongTimeString();
-            this.labelRadialOutput.Text = string.Format("[{0}] rotation changed: {1}", timestamp, deltaDegrees);
+            //Console.WriteLine("control acquired");
+            Invoke(new Action(() => {
+                var timestamp = DateTime.Now.ToLongTimeString();
+                this.labelRadialOutput.Text = string.Format("[{0}] control acquired", timestamp);
 
-            var data = new Dictionary<string, object>();
-            data["event_id"] = EventId_RotationChanged;
-            data["delta_degrees"] = deltaDegrees;
-            localUdpClient.Send(data);
+                var data = new Dictionary<string, object>();
+                data["event_id"] = EventId_ControlAcquired;
+                localUdpClient.Send(data);
+            }));
         }
 
-        private void OnRadialControlLost()
+        private void RadialController_ControlLost(RadialController sender, object args)
         {
-            var timestamp = DateTime.Now.ToLongTimeString();
-            this.labelRadialOutput.Text = string.Format("[{0}] control lost", timestamp);
+            //Console.WriteLine("control lost");
+            Invoke(new Action(() => {
+                var timestamp = DateTime.Now.ToLongTimeString();
+                this.labelRadialOutput.Text = string.Format("[{0}] control lost", timestamp);
 
-            var data = new Dictionary<string, object>();
-            data["event_id"] = EventId_ControlLost;
-            localUdpClient.Send(data);
+                var data = new Dictionary<string, object>();
+                data["event_id"] = EventId_ControlLost;
+                localUdpClient.Send(data);
+            }));
         }
 
-        private void OnRadialControlAcquired()
+        private void RadialController_RotationChanged(RadialController sender, RadialControllerRotationChangedEventArgs args)
         {
-            var timestamp = DateTime.Now.ToLongTimeString();
-            this.labelRadialOutput.Text = string.Format("[{0}] control acquired", timestamp);
+            //Console.WriteLine("rotation changed: " + args.RotationDeltaInDegrees);
+            Invoke(new Action(() => {
+                var timestamp = DateTime.Now.ToLongTimeString();
+                this.labelRadialOutput.Text = string.Format("[{0}] rotation changed: {1}", timestamp, args.RotationDeltaInDegrees);
 
-            var data = new Dictionary<string, object>();
-            data["event_id"] = EventId_ControlAcquired;
-            localUdpClient.Send(data);
+                var data = new Dictionary<string, object>();
+                data["event_id"] = EventId_RotationChanged;
+                data["delta_degrees"] = args.RotationDeltaInDegrees;
+                localUdpClient.Send(data);
+            }));
+        }
+        private void RadialController_ButtonPressed(RadialController sender, RadialControllerButtonPressedEventArgs args)
+        {
+            //Console.WriteLine("button pressed");
+            Invoke(new Action(() => {
+                var timestamp = DateTime.Now.ToLongTimeString();
+                this.labelRadialOutput.Text = string.Format("[{0}] button pressed", timestamp);
+
+                var data = new Dictionary<string, object>();
+                data["event_id"] = EventId_ButtonPressed;
+                localUdpClient.Send(data);
+            }));
         }
 
-        private void OnRadialButtonReleased()
+        private void RadialController_ButtonReleased(RadialController sender, RadialControllerButtonReleasedEventArgs args)
         {
-            var timestamp = DateTime.Now.ToLongTimeString();
-            this.labelRadialOutput.Text = string.Format("[{0}] button released", timestamp);
+            //Console.WriteLine("button released");
+            Invoke(new Action(() => {
+                var timestamp = DateTime.Now.ToLongTimeString();
+                this.labelRadialOutput.Text = string.Format("[{0}] button released", timestamp);
 
-            var data = new Dictionary<string, object>();
-            data["event_id"] = EventId_ButtonReleased;
-            localUdpClient.Send(data);
+                var data = new Dictionary<string, object>();
+                data["event_id"] = EventId_ButtonReleased;
+                localUdpClient.Send(data);
+            }));
         }
 
-        private void OnRadialButtonHolding()
+        private void RadialController_ButtonHolding(RadialController sender, RadialControllerButtonHoldingEventArgs args)
         {
-            var timestamp = DateTime.Now.ToLongTimeString();
-            this.labelRadialOutput.Text = string.Format("[{0}] button holding", timestamp);
+            //Console.WriteLine("button holding");
+            Invoke(new Action(() => {
+                var timestamp = DateTime.Now.ToLongTimeString();
+                this.labelRadialOutput.Text = string.Format("[{0}] button holding", timestamp);
 
-            var data = new Dictionary<string, object>();
-            data["event_id"] = EventId_ButtonHolding;
-            localUdpClient.Send(data);
+                var data = new Dictionary<string, object>();
+                data["event_id"] = EventId_ButtonHolding;
+                localUdpClient.Send(data);
+            }));
         }
 
-        private void OnRadialButtonPressed()
+        private void RadialController_ButtonClicked(RadialController sender, RadialControllerButtonClickedEventArgs args)
         {
-            var timestamp = DateTime.Now.ToLongTimeString();
-            this.labelRadialOutput.Text = string.Format("[{0}] button pressed", timestamp);
+            //Console.WriteLine("button clicked");
+            Invoke(new Action(() => {
+                var timestamp = DateTime.Now.ToLongTimeString();
+                this.labelRadialOutput.Text = string.Format("[{0}] button clicked", timestamp);
 
-            var data = new Dictionary<string, object>();
-            data["event_id"] = EventId_ButtonPressed;
-            localUdpClient.Send(data);
+                var data = new Dictionary<string, object>();
+                data["event_id"] = EventId_ButtonClicked;
+                localUdpClient.Send(data);
+            }));
         }
 
-        private void OnRadialButtonClicked()
+        private RadialControllerConfiguration GetConfig()
         {
-            var timestamp = DateTime.Now.ToLongTimeString();
-            this.labelRadialOutput.Text = string.Format("[{0}] button clicked", timestamp);
+            RadialControllerConfiguration radialControllerConfig;
+            IRadialControllerConfigurationInterop radialControllerConfigInterop = (IRadialControllerConfigurationInterop)System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeMarshal.GetActivationFactory(typeof(RadialControllerConfiguration));
+            Guid guid = typeof(RadialControllerConfiguration).GetInterface("IRadialControllerConfiguration").GUID;
 
-            var data = new Dictionary<string, object>();
-            data["event_id"] = EventId_ButtonClicked;
-            localUdpClient.Send(data);
+            radialControllerConfig = radialControllerConfigInterop.GetForWindow(this.windowHandle, ref guid);
+            return radialControllerConfig;
+        }
+
+        private void MenuSuppressed(bool suppressed)
+        {
+            //Console.WriteLine("[RadialControllerInterface] menu suppressed: " + suppressed);
+            var config = GetConfig();
+            config.ActiveControllerWhenMenuIsSuppressed = radialController;
+            config.IsMenuSuppressed = suppressed;
         }
 
         private void buttonSendTestMsg_Click(object sender, EventArgs e)
