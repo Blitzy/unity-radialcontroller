@@ -6,12 +6,10 @@ using UnityEngine.Events;
 
 namespace RadialController {
     public class RadialController : MonoBehaviour {
-
-        private IRadialControllerPlatformBridge _bridge;
-        private bool _allowClickEvent = true;
-
         [Tooltip("Default behaviour of the radial controller has the clicked event being sent even if the holding is activated. This flag allows you to alter that behaviour.")]
         public bool sendClickIfHolding = true;
+        public float rotationResolutionInDegrees = 10.0f;
+        public bool useAutoHapticFeedback = true;
 
         public UnityEvent onButtonClicked;
         public UnityEvent onButtonPressed;
@@ -21,12 +19,20 @@ namespace RadialController {
         public UnityEvent onControlAcquired;
         public UnityEvent onControlLost;
 
+        private float _prevRotationResolutionInDegrees;
+        private bool _prevUseAutoHapticFeedback;
+
+        private IRadialControllerPlatformBridge _bridge;
+        private bool _allowClickEvent = true;
+
         private void OnEnable() {
-            _bridge = PlatformBridgeFactory.CreateBridge();
+            enabled = true;
+            _bridge = PlatformBridgeFactory.CreateBridge(this);
 
             if (_bridge != null) {
                 Debug.LogFormat("[RadialController] Created platform bridge {0}.", _bridge.GetType().Name);
 
+                _bridge.onBridgeReady += OnBridgeReady;
                 _bridge.onButtonClicked += OnButtonClicked;
                 _bridge.onButtonPressed += OnButtonPressed;
                 _bridge.onButtonReleased += OnButtonReleased;
@@ -34,6 +40,9 @@ namespace RadialController {
                 _bridge.onRotationChanged += OnRotationChanged;
                 _bridge.onControlAcquired += OnControlAcquired;
                 _bridge.onControlLost += OnControlLost;
+
+                CheckRotationResolutionInDegrees(true);
+                CheckUseAutoHapticFeedback(true);
              } else {
                 Debug.LogWarningFormat("[RadialController] Current platform does not have a bridge implemented. Radial Controller will not be usable.");
             }
@@ -49,6 +58,9 @@ namespace RadialController {
 
         private void Update() {
             if (_bridge != null) {
+                CheckRotationResolutionInDegrees();
+                CheckUseAutoHapticFeedback();
+
                 _bridge.Update();
             }
         }
@@ -97,6 +109,14 @@ namespace RadialController {
             }
         }
 
+        private void OnBridgeReady() {
+            // Once the bridge is ready, send this components current settings to it to sync up.
+            if (_bridge != null) {
+                _bridge.SetRotationResolutionInDegrees(rotationResolutionInDegrees);
+                _bridge.SetUseAutoHapticFeedback(useAutoHapticFeedback);
+            }
+        }
+
         private void OnButtonClicked() {
             if (_allowClickEvent) { 
                 if (onButtonClicked != null) {
@@ -114,6 +134,26 @@ namespace RadialController {
         private void OnApplicationPause(bool paused) {
             if (_bridge != null) {
                 _bridge.OnApplicationPause(paused);
+            }
+        }
+
+        private void CheckRotationResolutionInDegrees(bool force = false) {
+            bool hasChanged = _prevRotationResolutionInDegrees != rotationResolutionInDegrees;
+            if (hasChanged || force) {
+                if (_bridge != null) {
+                    _bridge.SetRotationResolutionInDegrees((double)rotationResolutionInDegrees);
+                }
+                _prevRotationResolutionInDegrees = rotationResolutionInDegrees;
+            }
+        }
+
+        private void CheckUseAutoHapticFeedback(bool force = false) {
+            bool hasChanged = _prevUseAutoHapticFeedback != useAutoHapticFeedback;
+            if (hasChanged || force) {
+                if (_bridge != null) {
+                    _bridge.SetUseAutoHapticFeedback(useAutoHapticFeedback);
+                }
+                _prevUseAutoHapticFeedback = useAutoHapticFeedback;
             }
         }
     }

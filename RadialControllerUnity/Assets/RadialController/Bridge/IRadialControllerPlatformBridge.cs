@@ -5,14 +5,14 @@ namespace RadialController {
     /// Common interface that all radial controller platform bridges implement.
     /// </summary>
     public interface IRadialControllerPlatformBridge {
-
-         event Action onButtonClicked;
-         event Action onButtonPressed;
-         event Action onButtonReleased;
-         event Action onButtonHolding;
-         event Action<float> onRotationChanged;
-         event Action onControlAcquired;
-         event Action onControlLost;
+        event Action onBridgeReady;
+        event Action onButtonClicked;
+        event Action onButtonPressed;
+        event Action onButtonReleased;
+        event Action onButtonHolding;
+        event Action<float> onRotationChanged;
+        event Action onControlAcquired;
+        event Action onControlLost;
         
         /// <summary>
         /// Regular frame update from unity, managed by the radial controller component that creates this platform bridge.
@@ -34,5 +34,12 @@ namespace RadialController {
         /// Tell the platform bridge when the application has been paused or resumed.
         /// </summary>
         void OnApplicationPause(bool paused);
+
+        /// <summary>
+        /// Tell the platform bridge the minimum rotational value required for the RadialController object to fire a RotationChanged event.
+        /// </summary>
+        void SetRotationResolutionInDegrees(double degrees);
+
+        void SetUseAutoHapticFeedback(bool useAutoHapticFeedback);
     }
 }

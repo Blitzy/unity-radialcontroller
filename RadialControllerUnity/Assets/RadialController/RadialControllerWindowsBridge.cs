@@ -15,6 +15,8 @@ namespace RadialController {
         public const int Port = 27020;
 
         private const string Server_SenderId = "RadialControllerServer";
+
+        private const string EventId_ServerReady = "server_ready";
         private const string EventId_ControlAcquired = "radial_controller_control_acquired";
         private const string EventId_ControlLost = "radial_controller_control_lost";
         private const string EventId_ButtonClicked = "radial_controller_button_clicked";
@@ -22,11 +24,15 @@ namespace RadialController {
         private const string EventId_ButtonHolding = "radial_controller_button_holding";
         private const string EventId_ButtonReleased = "radial_controller_button_released";
         private const string EventId_RotationChanged = "radial_controller_rotation_changed";
+        private const string EventId_RotationResolutionInDegrees = "radial_controller_rotation_resolution_in_degrees";
+        private const string EventId_AutoHapticFeedback = "radial_controller_auto_haptic_feedback";
 
         private Process _serverProc;
         private Queue<LocalUdpPacket> _packetQueue;
         private LocalUdpClient _localUdpClient;
+        private RadialController _radialController;
 
+        public event Action onBridgeReady;
         public event Action onButtonClicked;
         public event Action onButtonPressed;
         public event Action onButtonReleased;
@@ -35,10 +41,11 @@ namespace RadialController {
         public event Action onControlAcquired;
         public event Action onControlLost;
 
-        public RadialControllerWindowsBridge() {
+        public RadialControllerWindowsBridge(RadialController radialController) {
+            _radialController = radialController;
             _packetQueue = new Queue<LocalUdpPacket>();
 
-            _localUdpClient = new LocalUdpClient("RadialControllerUnityReciever", Port);
+            _localUdpClient = new LocalUdpClient("RadialControllerUnityReceiver", Port);
             _localUdpClient.ignoreDataFromClient = true;
             _localUdpClient.onDataReceived += OnDataReceived;
         }
@@ -96,6 +103,11 @@ namespace RadialController {
 
                     if (eventId != null) {
                         switch(eventId) {
+                            case EventId_ServerReady:
+                                if (onBridgeReady != null) {
+                                    onBridgeReady();
+                                }
+                                break;
                             case EventId_ControlAcquired:
                                 if (onControlAcquired != null) {
                                     onControlAcquired();
@@ -161,6 +173,22 @@ namespace RadialController {
         }
 
         public void OnApplicationPause(bool paused){
+        }
+
+        public void SetRotationResolutionInDegrees(double degrees) {
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_RotationResolutionInDegrees;
+            data["degrees"] = degrees;
+
+            _localUdpClient.Send(data);
+        }
+
+        public void SetUseAutoHapticFeedback(bool useAutoHapticFeedback) {
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_AutoHapticFeedback;
+            data["use_auto_haptic_feedback"] = useAutoHapticFeedback;
+
+            _localUdpClient.Send(data);
         }
 
         public void Dispose() {

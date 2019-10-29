@@ -21,9 +21,10 @@ namespace RadialControllerWinForm
     public partial class Form1 : Form
     {
         public const int Port = 27020;
-        public const string VersionString = "v0.1.1 (October 28, 2019 2:54PM EST)";
+        public const string VersionString = "v0.1.1 (October 28, 2019)";
 
         private const string Client_SenderId = "RadialControllerUnityReceiver";
+        private const string EventId_ServerReady = "server_ready";
         private const string EventId_ControlAcquired = "radial_controller_control_acquired";
         private const string EventId_ControlLost = "radial_controller_control_lost";
         private const string EventId_ButtonClicked = "radial_controller_button_clicked";
@@ -32,6 +33,7 @@ namespace RadialControllerWinForm
         private const string EventId_ButtonReleased = "radial_controller_button_released";
         private const string EventId_RotationChanged = "radial_controller_rotation_changed";
         private const string EventId_RotationResolutionInDegrees = "radial_controller_rotation_resolution_in_degrees";
+        private const string EventId_AutoHapticFeedback = "radial_controller_auto_haptic_feedback";
 
         private IntPtr windowHandle;
         private RadialController radialController;
@@ -61,12 +63,16 @@ namespace RadialControllerWinForm
             CreateController();
             SubscribeToControllerCallbacks();
             MenuSuppressed(true);
+            SendServerReadyEvent();
         }
 
         private void OnIdle()
         {
             TimeSpan timespan = TimeSpan.FromMilliseconds(ApplicationIdleHelper.ElapsedTimeMS);
             this.labelRunTime.Text = timespan.ToString();
+            this.labelRotationResolution.Text = radialController.RotationResolutionInDegrees.ToString();
+            this.labelUseAutoHapticFeedback.Text = radialController.UseAutomaticHapticFeedback.ToString();
+
         }
 
         protected override void OnClosed(EventArgs e)
@@ -136,6 +142,10 @@ namespace RadialControllerWinForm
                             case EventId_RotationResolutionInDegrees:
                                 double degrees = Convert.ToDouble(packet.data["degrees"]);
                                 radialController.RotationResolutionInDegrees = degrees;
+                                break;
+                            case EventId_AutoHapticFeedback:
+                                bool useAutoHapticFeedback = Convert.ToBoolean(packet.data["use_auto_haptic_feedback"]);
+                                radialController.UseAutomaticHapticFeedback = useAutoHapticFeedback;
                                 break;
                             default:
                                 Console.WriteLine("Event Id " + eventId + " is not implemented.");
@@ -260,6 +270,13 @@ namespace RadialControllerWinForm
             var config = GetConfig();
             config.ActiveControllerWhenMenuIsSuppressed = radialController;
             config.IsMenuSuppressed = suppressed;
+        }
+
+        private void SendServerReadyEvent()
+        {
+            var data = new Dictionary<string, object>();
+            data["event_id"] = EventId_ServerReady;
+            localUdpClient.Send(data);
         }
 
         private void buttonSendTestMsg_Click(object sender, EventArgs e)
