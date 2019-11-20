@@ -12,6 +12,18 @@ using UnityEngine;
 namespace RadialController {
     public class RadialControllerWindowsBridge : IRadialControllerPlatformBridge
     {
+        #if UNITY_EDITOR
+        /// <summary>
+        /// Show the debug server process window when running in Unity Editor?
+        /// If true, the server process will start minimized in the taskbar. If false, the server process will be hidden.
+        /// 
+        /// NOTE: If the server process window is shown, Unity needs to restart the server process every time it regains focus in order for the Radial Controller to function.
+        /// This is technically a feature of the Radial Controller API in that it only works on windows that are in focus, and when showing the server process window it gains focus even
+        /// when minimized.
+        /// </summary>
+        public static bool EditorDebug_ShowServerWindow = false;
+        #endif
+
         public const int Port = 27020;
 
         private const string Server_SenderId = "RadialControllerServer";
@@ -34,7 +46,7 @@ namespace RadialController {
 
         public string Name { get { return "Radial Controller Windows Bridge"; } } 
 
-        public string Version { get { return "0.1.1"; } }
+        public string Version { get { return "0.2.0"; } }
 
         public event Action onBridgeReady;
         public event Action onButtonClicked;
@@ -55,6 +67,7 @@ namespace RadialController {
         }
 
         private void StartServerProcess() {
+            UnityEngine.Debug.Log("[RadialControllerWindowsBridge] Starting server process");
             var runningProcesses = Process.GetProcessesByName("RadialControllerServer");
 
             if (runningProcesses == null || runningProcesses.Length == 0) {
@@ -62,7 +75,12 @@ namespace RadialController {
                 var startInfo = new System.Diagnostics.ProcessStartInfo();
                 var exePath = System.IO.Path.Combine(Application.streamingAssetsPath, "RadialControllerServer.exe");
                 startInfo.FileName = exePath;
-                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+
+                #if UNITY_EDITOR
+                startInfo.WindowStyle = EditorDebug_ShowServerWindow ? ProcessWindowStyle.Minimized : ProcessWindowStyle.Hidden;
+                #else
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                #endif
 
                 _serverProc = Process.Start(startInfo);
             } else {
