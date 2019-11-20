@@ -6,8 +6,6 @@ using UnityEngine.Events;
 
 namespace RadialController {
     public class RadialController : MonoBehaviour {
-        public const string ClientVersion = "0.1.2";
-
         [Tooltip("Default behaviour of the radial controller has the clicked event being sent even if the holding is activated. This flag allows you to alter that behaviour.")]
         public bool sendClickIfHolding = true;
         public float rotationResolutionInDegrees = 10.0f;
@@ -28,7 +26,6 @@ namespace RadialController {
         private bool _allowClickEvent = true;
 
         private void Awake() {
-            Debug.LogFormat("[RadialController] Client Vesion: {0}", ClientVersion);
         }
 
         private void OnEnable() {
@@ -36,7 +33,7 @@ namespace RadialController {
             _bridge = PlatformBridgeFactory.CreateBridge(this);
 
             if (_bridge != null) {
-                Debug.LogFormat("[RadialController] Created platform bridge {0}.", _bridge.GetType().Name);
+                Debug.LogFormat("[RadialController] Created platform bridge {0} {1}.", _bridge.Name, _bridge.Version);
 
                 _bridge.onBridgeReady += OnBridgeReady;
                 _bridge.onButtonClicked += OnButtonClicked;

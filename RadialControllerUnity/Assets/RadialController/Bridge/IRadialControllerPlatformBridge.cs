@@ -13,6 +13,16 @@ namespace RadialController {
         event Action<float> onRotationChanged;
         event Action onControlAcquired;
         event Action onControlLost;
+
+        /// <summary>
+        /// Name of the platform bridge.
+        /// </summary>
+        string Name { get; }
+        
+        /// <summary>
+        /// Version of the platform bridge.
+        /// </summary>
+        string Version { get; }
         
         /// <summary>
         /// Regular frame update from unity, managed by the radial controller component that creates this platform bridge.

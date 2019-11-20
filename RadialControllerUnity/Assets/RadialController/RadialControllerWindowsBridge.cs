@@ -32,6 +32,10 @@ namespace RadialController {
         private LocalUdpClient _localUdpClient;
         private RadialController _radialController;
 
+        public string Name { get { return "Radial Controller Windows Bridge"; } } 
+
+        public string Version { get { return "0.1.1"; } }
+
         public event Action onBridgeReady;
         public event Action onButtonClicked;
         public event Action onButtonPressed;
