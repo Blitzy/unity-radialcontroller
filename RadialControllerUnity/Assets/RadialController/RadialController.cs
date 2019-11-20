@@ -6,6 +6,8 @@ using UnityEngine.Events;
 
 namespace RadialController {
     public class RadialController : MonoBehaviour {
+        public const string ClientVersion = "0.1.2";
+
         [Tooltip("Default behaviour of the radial controller has the clicked event being sent even if the holding is activated. This flag allows you to alter that behaviour.")]
         public bool sendClickIfHolding = true;
         public float rotationResolutionInDegrees = 10.0f;
@@ -24,6 +26,10 @@ namespace RadialController {
 
         private IRadialControllerPlatformBridge _bridge;
         private bool _allowClickEvent = true;
+
+        private void Awake() {
+            Debug.LogFormat("[RadialController] Client Vesion: {0}", ClientVersion);
+        }
 
         private void OnEnable() {
             enabled = true;
