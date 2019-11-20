@@ -33,7 +33,7 @@ namespace RadialController {
             _bridge = PlatformBridgeFactory.CreateBridge(this);
 
             if (_bridge != null) {
-                Debug.LogFormat("[RadialController] Created platform bridge {0} {1}.", _bridge.Name, _bridge.Version);
+                Debug.LogFormat("[RadialController] Created platform bridge: {0} {1}.", _bridge.Name, _bridge.Version);
 
                 _bridge.onBridgeReady += OnBridgeReady;
                 _bridge.onButtonClicked += OnButtonClicked;
@@ -53,7 +53,7 @@ namespace RadialController {
 
         private void OnDisable() {
             if (_bridge != null) {
-                Debug.LogFormat("[RadialController] Disposing of platform bridge {0}", _bridge.GetType().Name);
+                Debug.LogFormat("[RadialController] Disposing of platform bridge: {0}", _bridge.Name);
                 _bridge.Dispose();
                 _bridge = null;
             }

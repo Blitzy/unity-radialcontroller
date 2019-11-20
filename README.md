@@ -15,12 +15,21 @@ The `RadialControllerUnity` folder is a functioning example project with all nec
 
 To get started using a Radial Controller in your own Unity Project do the following:
 
+### Installation Option 1:
+
+Download & import the latest `.unitypackage` from the GitHub releases page of this repository.
+
+### Installation Option 2:
+
 1. Copy this folder to your project's Asset folder:
     - `RadialControllerUnity/RadialController`
 2. Copy this executable to your project's StreamingAssets folder.
     - `RadialControllerUnity/StreamingAssets/RadialControllerServer.exe`
-3. In your Unity scene, attach the `RadialController` component to a GameObject.
-4. Hook up event handlers to the various `RadialController` components UnityEvents and do all your Unity game logic from there.
+
+### How to use
+
+1. In your Unity scene, attach the `RadialController` component to a GameObject.
+2. Hook up event handlers to the various `RadialController` components UnityEvents and do all your Unity game logic from there.
 
 ## How does it work
 When you play your Unity project, the `RadialController` Unity component will attempt to create a bridge to communicate with the Radial Controller device depending on the platform being run on.
