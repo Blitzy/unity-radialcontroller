@@ -2,6 +2,21 @@
 
 # Changelog
 
+## v0.2.0
+
+### Date: 11/20/2019
+
+### Changes
+
+- Improvements
+    - Cleaned up project structure, moved all radial controller library and demo files underneath the RadialController folder.
+    - Added `Name` and `Version` properties to `IRadialControllerPlatormBridge`. These are printed to the console when the bridge is created.
+    - `RadialControllerWindowsBridge` server process now runs hidden.
+        - Making the server process run hidden by default solves the Unity/Server process focus fighting problem. Running the process hidden, Windows seem to allow the server process to continue capturing the Radial Controller input while Unity still technically has focus.
+        - If you want to see the server window while running in the Unity editor, you can set the `RadialControllerWindowsBridge.EditorDebug_ShowServerWindow` to `true`.
+- Bug Fixes
+    - Reset demo Radial Controller settings to defaults.
+
 ## v0.1.1
 
 ### Date: 10/28/2019
