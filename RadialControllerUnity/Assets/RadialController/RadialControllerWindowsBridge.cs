@@ -9,7 +9,7 @@ using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 
-namespace RadialController {
+namespace Blitzy.UnityRadialController {
     public class RadialControllerWindowsBridge : IRadialControllerPlatformBridge
     {
         #if UNITY_EDITOR
@@ -46,7 +46,7 @@ namespace RadialController {
 
         public string Name { get { return "Radial Controller Windows Bridge"; } } 
 
-        public string Version { get { return "0.2.0"; } }
+        public string Version { get { return "0.2.1"; } }
 
         public event Action onBridgeReady;
         public event Action onButtonClicked;

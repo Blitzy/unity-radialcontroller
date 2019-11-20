@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace RadialController {
+namespace Blitzy.UnityRadialController {
     public class RadialController : MonoBehaviour {
         [Tooltip("Default behaviour of the radial controller has the clicked event being sent even if the holding is activated. This flag allows you to alter that behaviour.")]
         public bool sendClickIfHolding = true;

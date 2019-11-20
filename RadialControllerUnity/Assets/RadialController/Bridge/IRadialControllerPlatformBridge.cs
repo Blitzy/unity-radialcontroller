@@ -1,6 +1,6 @@
 using System;
 
-namespace RadialController {
+namespace Blitzy.UnityRadialController {
     /// <summary>
     /// Common interface that all radial controller platform bridges implement.
     /// </summary>

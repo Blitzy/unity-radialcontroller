@@ -2,6 +2,14 @@
 
 # Changelog
 
+## v0.2.1
+
+### Date: 11/20/2019
+
+### Changes
+- Bug Fixes
+    - Changed `RadialController` namespace to `Blitzy.UnityRadialController`. This fixes the same name conflict between the `RadialController` namespace and the `RadialController` class.
+
 ## v0.2.0
 
 ### Date: 11/20/2019

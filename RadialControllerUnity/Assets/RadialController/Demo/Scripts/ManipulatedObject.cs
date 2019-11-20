@@ -6,7 +6,6 @@ public class ManipulatedObject : MonoBehaviour {
     public float scaleSpeed = 1.0f;
     public float maxScale = 3.0f;
     public float minScale = 0.5f;
-
     private float curScale = 1.0f;
 
     public void Manipulate(float amount) {
