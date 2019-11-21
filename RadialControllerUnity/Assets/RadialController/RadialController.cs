@@ -11,13 +11,13 @@ namespace Blitzy.UnityRadialController {
         public float rotationResolutionInDegrees = 10.0f;
         public bool useAutoHapticFeedback = true;
 
-        public UnityEvent onButtonClicked;
-        public UnityEvent onButtonPressed;
-        public UnityEvent onButtonReleased;
-        public UnityEvent onButtonHolding;
-        public FloatEvent onRotationChanged;
-        public UnityEvent onControlAcquired;
-        public UnityEvent onControlLost;
+        public UnityEvent onButtonClicked = new UnityEvent();
+        public UnityEvent onButtonPressed = new UnityEvent();
+        public UnityEvent onButtonReleased = new UnityEvent();
+        public UnityEvent onButtonHolding = new UnityEvent();
+        public FloatEvent onRotationChanged = new FloatEvent();
+        public UnityEvent onControlAcquired = new UnityEvent();
+        public UnityEvent onControlLost = new UnityEvent();
 
         private float _prevRotationResolutionInDegrees;
         private bool _prevUseAutoHapticFeedback;

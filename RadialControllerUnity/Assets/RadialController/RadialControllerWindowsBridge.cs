@@ -46,7 +46,7 @@ namespace Blitzy.UnityRadialController {
 
         public string Name { get { return "Radial Controller Windows Bridge"; } } 
 
-        public string Version { get { return "0.2.1"; } }
+        public string Version { get { return "0.2.2"; } }
 
         public event Action onBridgeReady;
         public event Action onButtonClicked;
@@ -64,6 +64,8 @@ namespace Blitzy.UnityRadialController {
             _localUdpClient = new LocalUdpClient("RadialControllerUnityReceiver", Port);
             _localUdpClient.ignoreDataFromClient = true;
             _localUdpClient.onDataReceived += OnDataReceived;
+
+            StartServerProcess();
         }
 
         private void StartServerProcess() {

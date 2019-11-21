@@ -2,6 +2,15 @@
 
 # Changelog
 
+## v0.2.2
+
+### Date: 11/21/2019
+
+### Changes
+- Bug Fixes
+    - Fixed UnityEvents on `RadialController` being null if instanced at runtime.
+    - Fixed `RadialControllerWindowsBridge.StartServerProcess` not being invoked if the `RadialController` component is instanced at runtime.
+
 ## v0.2.1
 
 ### Date: 11/20/2019
